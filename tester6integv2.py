@@ -39,6 +39,7 @@ def plotHist(title, df, chartSize):
 
 
 #Plots a correlation graph
+#Params: title of the graph, dataframe, size of the graph
 def plotCorrelation(title, df, chartSize):
     try:
         corr = df.corr()
@@ -56,22 +57,30 @@ def plotCorrelation(title, df, chartSize):
         print("There was an error. Please check your dataframe.")
 
 #Plots a standard graph
+#Params: title of the chart, dataframe
 def plotGraph(title, df):
-    #Plot graph
-    plt.plot()
-    plt.show()
+    try:
+        #Plot graph
+        plt.title=title
+        plt.plot(df)
+        plt.show()
+    except:
+        print("There was an error. Please check your dataframe.")
 
 #Plots a pie chart.
 #Params: title of the chart, labels for the slices, the percentage of the pie, the distance to split the pie slice from the rest of the pie chart
 def plotPieChart(title, labels, pieSizes, explode):
-    #Define pie settings
-    plt.pie(pieSizes, explode=explode, labels=labels, autopct='%1.1f%%',shadow=True,startangle=90)
-    #Making sure the pie is a circle
-    plt.axis("equal")
-    #Display title, ensuring that it doesn't block the pie chart
-    plt.title(title, horizontalalignment='center', verticalalignment='top',y=1.08, bbox={'pad':5})
-    #Display chart
-    plt.show()
+    try:
+        #Define pie settings
+        plt.pie(pieSizes, explode=explode, labels=labels, autopct='%1.1f%%',shadow=True,startangle=90)
+        #Making sure the pie is a circle
+        plt.axis("equal")
+        #Display title, ensuring that it doesn't block the pie chart
+        plt.title(title, horizontalalignment='center', verticalalignment='top',y=1.08, bbox={'pad':5})
+        #Display chart
+        plt.show()
+    except:
+        print("There was an error. Please check your dataframe.")
 
 #Converts any string values that could be changed to boolean values, e.g: Yes = "1", No = "0"
 def convertStringToBool(column, trueVal, falseVal):
@@ -120,4 +129,11 @@ foodChainCompanies = ['MCD','SBUX','YUM','QSR']
 biggestBiomedicalCompanies = ['JNJ','RHHBF','SHTDF','PFE','GSK']
 x = bundleStockPrices(SP500IndexSymbol,200)
 print(x)
+#Demo for correlation graph
+plotCorrelation("test",x,8)
+#Demo for Histogram
+plotHist("test",x,8)
+#Demo for Line Graph
 plotLineGraph("test",x,200)
+# Pie chart will not work with dataframes yet
+# plotPieChart("test",x.columns,[1,2,3,4],[0,0,0,0])
