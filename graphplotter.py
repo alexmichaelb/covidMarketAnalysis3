@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib import style
 import numpy as np
-#import pandas as pd
+import pandas as pd
 
 #Set colour styling for graphs, feel free to change
 #list of styles: https://matplotlib.org/3.2.2/gallery/style_sheets/style_sheets_reference.html

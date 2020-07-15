@@ -121,4 +121,3 @@ biggestBiomedicalCompanies = ['JNJ','RHHBF','SHTDF','PFE','GSK']
 x = bundleStockPrices(SP500IndexSymbol,200)
 print(x)
 plotLineGraph("test",x,200)
-
