@@ -1,15 +1,16 @@
+#Webscrape wikipedia for lockdown start dates and end dates
 import urllib.request
-import json
+from bs4 import BeautifulSoup
 import pandas as pd
 
 import matplotlib.pyplot as plt
 from matplotlib import style
 import numpy as np
-#import pandas as pd
+import pandas as pd
 
 #Set colour styling for graphs, feel free to change
 #list of styles: https://matplotlib.org/3.2.2/gallery/style_sheets/style_sheets_reference.html
-style.use('ggplot')
+style.use('default')
 
 #Plot line graphs using this function. Useful for stock prices.
 #Params: title of the graph, dataframe
@@ -92,48 +93,33 @@ def getFilteredColumn(df, column, param):
     return len(df.loc[df[column] == param])
 
 
-def getPriceOfStock(companySymbol, numOfDays): #Returns a pandaDF of the closing stock price in the last numsOfDays days
-    url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol="+companySymbol+"&outputsize=full&apikey=Y11HUWNU7HM58RRL"
-    json_obj = urllib.request.urlopen(url)
-# Finds the data from the url
-    data = json.load(json_obj)
-    dates = data["Time Series (Daily)"] #Choosing the revelant key in the data dictionary
-    final_prices = []
-    calendar = []
-    counter = 0
-    for day in dates:
-        counter += 1
-        if counter > numOfDays: #Limits the amount of data needed by using the number of days
-            break
-        prices = dates[day]
-        priceNum = float(prices['4. close']) #Choosing the data price
-        final_prices.append(priceNum)
-        calendar.append(day)  # Keep tracks of the dates pulled
-    stockDict ={companySymbol : final_prices}
-    df = pd.DataFrame(data = stockDict, index = pd.to_datetime(calendar))
-    return df
 
-# NOTE: Alpha Vantage only allows 5 API calls a minute, 500 a day -> Only have an input size of list size 5
-def bundleStockPrices(arrayOfCompanySymbols, numOfDays): #Function to format (multiple) stocks in a PandaDF
-    largeTable = getPriceOfStock(arrayOfCompanySymbols[0], numOfDays)
-    del arrayOfCompanySymbols[0]
-    for symbol in arrayOfCompanySymbols:
-        smallTable = getPriceOfStock(symbol, numOfDays)
-        largeTable = pd.concat([largeTable, smallTable.reindex(largeTable.index)], axis = 1) #Concatenating the tables together
-    return largeTable
+#URL for the wikipedia page
+url = "https://en.wikipedia.org/wiki/COVID-19_pandemic_lockdowns"
 
-# Examples:
-SP500IndexSymbol = ['FXAIX','SWPPX','VFINX','SVSPX','SPY']
-largestAirlineCompanies = ['DAL','AAL','DLAKF','UAL','AFRAF']
-foodChainCompanies = ['MCD','SBUX','YUM','QSR']
-biggestBiomedicalCompanies = ['JNJ','RHHBF','SHTDF','PFE','GSK']
-x = bundleStockPrices(SP500IndexSymbol,200)
-print(x)
-#Demo for correlation graph
-plotCorrelation("test",x,8)
-#Demo for Histogram
-plotHist("test",x,8)
-#Demo for Line Graph
-plotLineGraph("test",x,200)
-# Pie chart will not work with dataframes yet
-# plotPieChart("test",x.columns,[1,2,3,4],[0,0,0,0])
+page = urllib.request.urlopen(url)
+
+soup = BeautifulSoup(page)
+
+all_tables = soup.find_all("table")
+right_table = soup.find("table", class_="wikitable sortable mw-collapsible")
+
+C=[]
+D=[]
+for row in right_table.findAll('tr'):
+    cells=row.findAll('td')
+    if len(cells)==3:
+        C.append(cells[1].find(text=True))        
+        D.append(cells[2].find(text=True))
+
+
+df=pd.DataFrame(C,columns=['Start Date'])
+df['End Date']=D
+pd.set_option('display.max_rows',500)
+
+df.at[45, 'End Date'] = "\\n"
+df.at[46, 'End Date'] = "\\n"
+
+
+print(df)
+plotHist("test",df,8)
